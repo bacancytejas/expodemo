@@ -1,209 +1,197 @@
-import * as WebBrowser from 'expo-web-browser';
 import React from 'react';
 import {
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 import Modal from "react-native-modal";
-import { MonoText } from '../components/StyledText';
 import MultiSelectList from "../components/MultiSelectList/MultiSelectList";
 
-
+const FILTER_DATA1 = ["tejas","chirag"];
+const FILTER_DATA2 = ["test","chirag"];
+const FILTER_DATA3 = ["rajdeep","binit"];
 
 export default class HomeScreen extends React.Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            openFilterModal: false,
+            filters: {
+                "test1": [],
+                "test2": [],
+                "test3": []
+            }
+        }
+    }
 
-  constructor(props) {
-      super(props)
-      this.state = {
-        openFilterModal:false
-      }
-  }
+    openFilterModal = () => {
+        console.log("ccc");
+        this.setState({openFilterModal: !this.state.openFilterModal});
+    }
 
-  openFilterModal = () => {
-      console.log("ccc");
-      this.setState({openFilterModal: !this.state.openFilterModal});
-  }
+    onPressFilterDone = async (filterType, filters) => {
+        console.log("Done----", filterType, filters)
+        let filterArray = this.state.filters;
+        switch (filterType) {
+            case "test1" :
+                filterArray[filterType] = filters;
+                await this.setState({filters:filterArray})
+            case "test2" :
+                filterArray[filterType] = filters;
+                await this.setState({filters:filterArray})
+            case "test3" :
+                filterArray[filterType] = filters;
+                await this.setState({filters:filterArray})
 
-  onPressFilterDone = () => {
-    console.log()
-  }
+        }
+    }
 
-  render() {
-      return (
-          <View style={styles.container}>
-              <ScrollView
-                  style={styles.container}
-                  contentContainerStyle={styles.contentContainer}>
-                  <View style={styles.getStartedContainer}>
-                      <TouchableOpacity style={{marginTop:30, padding :20}} onPress={this.openFilterModal}>
-                          <Text>{"Test"}</Text>
-                      </TouchableOpacity>
-                  </View>
-              </ScrollView>
+    onApplyFilters = () => {
+        console.log("filters---", this.state.filters);
+    }
 
+    render() {
+        return (
+            <View style={styles.container}>
+                <ScrollView
+                    style={styles.container}
+                    contentContainerStyle={styles.contentContainer}>
+                    <View style={styles.getStartedContainer}>
+                        <TouchableOpacity style={{marginTop: 30, padding: 20}} onPress={this.openFilterModal}>
+                            <Text>{"Test"}</Text>
+                        </TouchableOpacity>
+                    </View>
+                </ScrollView>
 
-              <View style={styles.tabBarInfoContainer}>
-                  <Text style={styles.tabBarInfoText}>
-                      This is a tab bar. You can edit it in:
-                  </Text>
-
-                  <View
-                      style={[styles.codeHighlightContainer, styles.navigationFilename]}>
-                      <MonoText style={styles.codeHighlightText}>
-                          navigation/MainTabNavigator.js
-                      </MonoText>
-                  </View>
-              </View>
-              <Modal
-                  backdropColor={'rgba(0,0,0,0.1)'}
-                  onBackdropPress={()=> this.setState({openFilterModal:!this.state.openFilterModal})}
-                  visible={this.state.openFilterModal}>
-                  <View style={{flex:0.5, backgroundColor: 'white', alignItems:'center', shadowColor:"gray",shadowOffset:{height:0, width:0}, shadowOpacity:0.5, justifyContent:'center'}}>
-                      <View style={{flex:0.8, backgroundColor: 'white', width:"90%"}}>
-                          <Text style={{fontSize:18, paddingLeft:20}}>{"Filters"}</Text>
-                          <MultiSelectList onPressFilterDone={this.onPressFilterDone} />
-                          <MultiSelectList/>
-                          <MultiSelectList/>
-                      </View>
-                  </View>
-              </Modal>
-          </View>
-      );
-  }
+                <Modal
+                    backdropColor={'#0098D7'}
+                    backdropOpacity={0.70}
+                    transparent={true}
+                    onBackdropPress={() => this.setState({openFilterModal: !this.state.openFilterModal})}
+                    isVisible={this.state.openFilterModal}>
+                    <View style={styles.filterMainRow}>
+                        <View style={styles.blueRow}/>
+                        <View style={styles.filterInputRow}>
+                            <View style={styles.filterTitleRow}>
+                                <Text style={styles.filterHeaderText}>{"Filters By Data"}</Text>
+                            </View>
+                            <MultiSelectList filterType={"test1"} placeholder={"Search 1"} data={FILTER_DATA1} onPressFilterDone={this.onPressFilterDone}/>
+                            <MultiSelectList filterType={"test2"} placeholder={"Search 3"} data={FILTER_DATA2} onPressFilterDone={this.onPressFilterDone}/>
+                            <MultiSelectList filterType={"test3"} placeholder={"Search 3"} data={FILTER_DATA3} onPressFilterDone={this.onPressFilterDone}/>
+                        </View>
+                        <View style={styles.actionRow}>
+                            <TouchableOpacity onPress={this.openFilterModal} style={styles.cancelButtonRow}>
+                                <Text style={styles.cancelButtonText}>{"Cancel"}</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={this.onApplyFilters} style={styles.filterButtonRow}>
+                                <Text style={styles.filterButtonText}>{"Apply Filters"}</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
+            </View>
+        );
+    }
 }
 
 HomeScreen.navigationOptions = {
-  header: null,
+    header: null,
 };
 
-function DevelopmentModeNotice() {
-  if (__DEV__) {
-    const learnMoreButton = (
-      <Text onPress={handleLearnMorePress} style={styles.helpLinkText}>
-        Learn more
-      </Text>
-    );
-
-    return (
-      <Text style={styles.developmentModeText}>
-        Development mode is enabled: your app will be slower but you can use
-        useful development tools. {learnMoreButton}
-      </Text>
-    );
-  } else {
-    return (
-      <Text style={styles.developmentModeText}>
-        You are not in development mode: your app will run at full speed.
-      </Text>
-    );
-  }
-}
-
-function handleLearnMorePress() {
-  WebBrowser.openBrowserAsync(
-    'https://docs.expo.io/versions/latest/workflow/development-mode/'
-  );
-}
-
-function handleHelpPress() {
-  WebBrowser.openBrowserAsync(
-    'https://docs.expo.io/versions/latest/workflow/up-and-running/#cant-see-your-changes'
-  );
-}
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  developmentModeText: {
-    marginBottom: 20,
-    color: 'rgba(0,0,0,0.4)',
-    fontSize: 14,
-    lineHeight: 19,
-    textAlign: 'center',
-  },
-  contentContainer: {
-    paddingTop: 30,
-  },
-  welcomeContainer: {
-    alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  welcomeImage: {
-    width: 100,
-    height: 80,
-    resizeMode: 'contain',
-    marginTop: 3,
-    marginLeft: -10,
-  },
-  getStartedContainer: {
-    alignItems: 'center',
-    marginHorizontal: 50,
-  },
-  homeScreenFilename: {
-    marginVertical: 7,
-  },
-  codeHighlightText: {
-    color: 'rgba(96,100,109, 0.8)',
-  },
-  codeHighlightContainer: {
-    backgroundColor: 'rgba(0,0,0,0.05)',
-    borderRadius: 3,
-    paddingHorizontal: 4,
-  },
-  getStartedText: {
-    fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
-    lineHeight: 24,
-    textAlign: 'center',
-  },
-  tabBarInfoContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    ...Platform.select({
-      ios: {
-        shadowColor: 'black',
-        shadowOffset: { width: 0, height: -3 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
-      },
-      android: {
-        elevation: 20,
-      },
-    }),
-    alignItems: 'center',
-    backgroundColor: '#fbfbfb',
-    paddingVertical: 20,
-  },
-  tabBarInfoText: {
-    fontSize: 17,
-    color: 'rgba(96,100,109, 1)',
-    textAlign: 'center',
-  },
-  navigationFilename: {
-    marginTop: 5,
-  },
-  helpContainer: {
-    marginTop: 15,
-    alignItems: 'center',
-  },
-  helpLink: {
-    paddingVertical: 15,
-  },
-  helpLinkText: {
-    fontSize: 14,
-    color: '#2e78b7',
-  },
+    container: {
+        flex: 1,
+    },
+    contentContainer: {
+        paddingTop: 30,
+    },
+    getStartedContainer: {
+        alignItems: 'center',
+        marginHorizontal: 50,
+    },
     containerModal: {
         backgroundColor: "pink",
         paddingHorizontal: 20,
         alignItems: 'center'
     },
+    blueRow:{
+        borderColor: "blue",
+        borderWidth: 2,
+        alignItems:"flex-start",
+        alignSelf: "flex-start",
+        marginTop: 5,
+        width:"20%",
+        marginLeft:20
+    },
+    filterMainRow:{
+        flex: 0.6,
+        backgroundColor: 'white',
+        alignItems: 'center',
+        shadowColor: "gray",
+        shadowOffset: {height: 0, width: 0},
+        shadowOpacity: 0.5,
+        justifyContent: 'center'
+    },
+    filterInputRow: {
+        flex: 1,
+        backgroundColor: 'white',
+        width:"90%"
+    },
+    filterTitleRow:{
+        marginVertical: 8,
+    },
+    filterHeaderText:{
+        fontSize: 18,
+        paddingLeft: 5,
+        paddingTop: 5,
+        justifyContent: 'center',
+        alignSelf: "flex-start",
+    },
+    actionRow: {
+        flexDirection: "row",
+        alignItems: "flex-start",
+        justifyContent: 'center'
+    },
+    cancelButtonRow:{
+        justifyContent: 'center',
+        flexDirection: 'row',
+        height: 50,
+        minHeight: 50,
+        width: "40%",
+        marginRight:5,
+        alignItems: "center",
+        marginVertical: 8
+    },
+    cancelButtonText:{
+        color: "black",
+        fontSize: 18,
+    },
+    filterButtonRow:{
+        justifyContent: 'center',
+        flexDirection: 'row',
+        height: 50,
+        minHeight: 50,
+        width: "40%",
+        borderWidth: 1,
+        alignSelf: "flex-end",
+        alignItems: "center",
+        borderColor: "lightgray",
+        borderRadius: 10,
+        marginVertical: 8,
+        backgroundColor: "white",
+        shadowColor: "lightgray",
+        shadowOpacity: 0.5,
+        elevation: 3,
+        shadowOffset: {
+            height: 0,
+            width: 0
+        }
+    },
+    filterButtonText: {
+        color: "black",
+        fontSize: 18,
+        paddingLeft: 10
+    }
 });
