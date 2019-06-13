@@ -26,7 +26,7 @@ export default class MultiSelectList extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            selected: (new Map(): Map<string>), focus: false
+            selected: props.defaultValue.length ?  new Map(props.defaultValue.map(i => [i, true])) : (new Map(): Map<string>), focus: false
         }
     }
 

@@ -32,7 +32,6 @@ export default class HomeScreen extends React.Component {
     }
 
     onPressFilterDone = async (filterType, filters) => {
-        console.log("Done----", filterType, filters)
         let filterArray = this.state.filters;
         switch (filterType) {
             case "test1" :
@@ -48,11 +47,15 @@ export default class HomeScreen extends React.Component {
         }
     }
 
-    onApplyFilters = () => {
+    onApplyFilters = async () => {
         console.log("filters---", this.state.filters);
+        await this.openFilterModal();
     }
 
     render() {
+
+        const {filters} = this.state;
+        console.log("render3---",filters.test1, filters);
         return (
             <View style={styles.container}>
                 <ScrollView
@@ -77,9 +80,27 @@ export default class HomeScreen extends React.Component {
                             <View style={styles.filterTitleRow}>
                                 <Text style={styles.filterHeaderText}>{"Filters By Data"}</Text>
                             </View>
-                            <MultiSelectList filterType={"test1"} placeholder={"Search 1"} data={FILTER_DATA1} onPressFilterDone={this.onPressFilterDone}/>
-                            <MultiSelectList filterType={"test2"} placeholder={"Search 3"} data={FILTER_DATA2} onPressFilterDone={this.onPressFilterDone}/>
-                            <MultiSelectList filterType={"test3"} placeholder={"Search 3"} data={FILTER_DATA3} onPressFilterDone={this.onPressFilterDone}/>
+                            <MultiSelectList
+                                defaultValue={filters.test1}
+                                filterType={"test1"}
+                                placeholder={"Search 1"}
+                                data={FILTER_DATA1}
+                                onPressFilterDone={this.onPressFilterDone}
+                            />
+                            <MultiSelectList
+                                defaultValue={filters["test2"]}
+                                filterType={"test2"}
+                                placeholder={"Search 2"}
+                                data={FILTER_DATA2}
+                                onPressFilterDone={this.onPressFilterDone}
+                            />
+                            <MultiSelectList
+                                defaultValue={filters["test3"]}
+                                filterType={"test3"}
+                                placeholder={"Search 3"}
+                                data={FILTER_DATA3}
+                                onPressFilterDone={this.onPressFilterDone}
+                            />
                         </View>
                         <View style={styles.actionRow}>
                             <TouchableOpacity onPress={this.openFilterModal} style={styles.cancelButtonRow}>
