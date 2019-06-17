@@ -10,8 +10,7 @@ import {
     SafeAreaView,
     TouchableOpacity,
 } from 'react-native'
-import { Marker, Callout } from 'react-native-maps'
-import {MapView} from "expo";
+import MapView, { PROVIDER_GOOGLE, Marker, Callout } from 'react-native-maps'
 import ClusteredMapView from 'react-native-maps-super-cluster'
 import { generateRandomPoints, generateRandomPoint } from './generator'
 
@@ -76,7 +75,7 @@ export default class App extends Component {
                 {/* Cluster Map Example */}
                 <ClusteredMapView
                     style={{flex: 1}}
-                    provider={MapView.PROVIDER_GOOGLE} //https://medium.com/nycdev/create-a-react-native-app-with-google-map-using-expo-io-68041252023d
+                    provider={PROVIDER_GOOGLE} //https://medium.com/nycdev/create-a-react-native-app-with-google-map-using-expo-io-68041252023d
                     showUserLocation={true}
                     data={this.state.pins}
                     renderMarker={this.renderMarker}
