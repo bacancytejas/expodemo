@@ -11,6 +11,7 @@ import {
     TouchableOpacity,
 } from 'react-native'
 import { Marker, Callout } from 'react-native-maps'
+import {MapView} from "expo";
 import ClusteredMapView from 'react-native-maps-super-cluster'
 import { generateRandomPoints, generateRandomPoint } from './generator'
 
@@ -75,6 +76,8 @@ export default class App extends Component {
                 {/* Cluster Map Example */}
                 <ClusteredMapView
                     style={{flex: 1}}
+                    provider={MapView.PROVIDER_GOOGLE}
+                    showUserLocation={true}
                     data={this.state.pins}
                     renderMarker={this.renderMarker}
                     renderCluster={this.renderCluster}
@@ -83,7 +86,7 @@ export default class App extends Component {
                         Markers rendered as children of ClusteredMapView are not taken in account by the clustering feature,
                         they will just act as they were rendered within a normal react-native-maps instance
                     */}
-                    <Marker coordinate={{ latitude: 44.710968, longitude: 10.640131 }} pinColor={'#65bc46'} />
+                    {/*<Marker coordinate={{ latitude: 44.710968, longitude: 10.640131 }} pinColor={'#65bc46'} />*/}
                 </ClusteredMapView>
 
                 {/* Header - Control Test Bar */}
