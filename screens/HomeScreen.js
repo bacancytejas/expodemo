@@ -1,218 +1,187 @@
-import React from 'react';
+// @flow
+'use-strict'
+
+import React, { Component } from 'react'
 import {
-    ScrollView,
-    StyleSheet,
     Text,
-    TouchableOpacity,
     View,
-} from 'react-native';
-import Modal from "react-native-modal";
-import MultiSelectList from "../components/MultiSelectList/MultiSelectList";
+    Image,
+    StyleSheet,
+    SafeAreaView,
+    TouchableOpacity,
+} from 'react-native'
+import { Marker, Callout } from 'react-native-maps'
+import ClusteredMapView from 'react-native-maps-super-cluster'
+import { generateRandomPoints, generateRandomPoint } from './generator'
 
-const FILTER_DATA1 = ["tejas","chirag"];
-const FILTER_DATA2 = ["test","chirag"];
-const FILTER_DATA3 = ["rajdeep","binit"];
 
-export default class HomeScreen extends React.Component {
+const italyCenterLatitude = 41.8962667,
+    italyCenterLongitude = 11.3340056,
+    radius = 600000
+export default class App extends Component {
+
     constructor(props) {
         super(props)
+
         this.state = {
-            openFilterModal: false,
-            filters: {
-                "test1": [],
-                "test2": [],
-                "test3": []
-            }
+            pins: []
         }
+
+        this.reload = this.reload.bind(this)
+        this.loadMore = this.loadMore.bind(this)
+        this.renderMarker = this.renderMarker.bind(this)
+        this.renderCluster = this.renderCluster.bind(this)
     }
 
-    openFilterModal = () => {
-        console.log("ccc");
-        this.setState({openFilterModal: !this.state.openFilterModal});
+    componentDidMount() {
+        this.reload()
     }
 
-    onPressFilterDone = async (filterType, filters) => {
-        let filterArray = this.state.filters;
-        switch (filterType) {
-            case "test1" :
-                filterArray[filterType] = filters;
-                await this.setState({filters:filterArray})
-            case "test2" :
-                filterArray[filterType] = filters;
-                await this.setState({filters:filterArray})
-            case "test3" :
-                filterArray[filterType] = filters;
-                await this.setState({filters:filterArray})
-
-        }
+    reload = () => {
+        const pins = generateRandomPoints({latitude: italyCenterLatitude, longitude: italyCenterLongitude}, radius, 50, this.state.pins.length)
+        this.setState({ pins: pins})
     }
 
-    onApplyFilters = async () => {
-        console.log("filters---", this.state.filters);
-        await this.openFilterModal();
+    loadMore = () => {
+        const pins = generateRandomPoints({latitude: italyCenterLatitude, longitude: italyCenterLongitude}, radius, 50, this.state.pins.length)
+        this.setState({ pins: this.state.pins.concat(pins) })
+    }
+
+    renderCluster = (cluster, onPress) => {
+        const pointCount = cluster.pointCount,
+            coordinate = cluster.coordinate,
+            clusterId = cluster.clusterId
+
+        return (
+            <Marker identifier={`cluster-${clusterId}`} coordinate={coordinate} onPress={onPress}>
+                <View style={styles.clusterContainer}>
+                    <Text style={styles.clusterText}>
+                        {pointCount}
+                    </Text>
+                </View>
+            </Marker>
+        )
+    }
+
+    renderMarker = (pin) => {
+        return (
+            <Marker identifier={`pin-${pin.id}`} key={pin.id} coordinate={pin.location} />
+        )
     }
 
     render() {
-
-        const {filters} = this.state;
-        console.log("render3---",filters.test1, filters);
         return (
-            <View style={styles.container}>
-                <ScrollView
-                    style={styles.container}
-                    contentContainerStyle={styles.contentContainer}>
-                    <View style={styles.getStartedContainer}>
-                        <TouchableOpacity style={{marginTop: 30, padding: 20}} onPress={this.openFilterModal}>
-                            <Text>{"Test"}</Text>
-                        </TouchableOpacity>
-                    </View>
-                </ScrollView>
+            <SafeAreaView style={styles.container}>
+                {/* Cluster Map Example */}
+                <ClusteredMapView
+                    style={{flex: 1}}
+                    data={this.state.pins}
+                    renderMarker={this.renderMarker}
+                    renderCluster={this.renderCluster}
+                    initialRegion={{latitude: italyCenterLatitude, longitude: italyCenterLongitude, latitudeDelta: 12, longitudeDelta: 12 }}>
+                    {/*
+                        Markers rendered as children of ClusteredMapView are not taken in account by the clustering feature,
+                        they will just act as they were rendered within a normal react-native-maps instance
+                    */}
+                    <Marker coordinate={{ latitude: 44.710968, longitude: 10.640131 }} pinColor={'#65bc46'} />
+                </ClusteredMapView>
 
-                <Modal
-                    backdropColor={'#0098D7'}
-                    backdropOpacity={0.70}
-                    transparent={true}
-                    onBackdropPress={() => this.setState({openFilterModal: !this.state.openFilterModal})}
-                    isVisible={this.state.openFilterModal}>
-                    <View style={styles.filterMainRow}>
-                        <View style={styles.blueRow}/>
-                        <View style={styles.filterInputRow}>
-                            <View style={styles.filterTitleRow}>
-                                <Text style={styles.filterHeaderText}>{"Filters By Data"}</Text>
-                            </View>
-                            <MultiSelectList
-                                defaultValue={filters.test1}
-                                filterType={"test1"}
-                                placeholder={"Search 1"}
-                                data={FILTER_DATA1}
-                                onPressFilterDone={this.onPressFilterDone}
-                            />
-                            <MultiSelectList
-                                defaultValue={filters["test2"]}
-                                filterType={"test2"}
-                                placeholder={"Search 2"}
-                                data={FILTER_DATA2}
-                                onPressFilterDone={this.onPressFilterDone}
-                            />
-                            <MultiSelectList
-                                defaultValue={filters["test3"]}
-                                filterType={"test3"}
-                                placeholder={"Search 3"}
-                                data={FILTER_DATA3}
-                                onPressFilterDone={this.onPressFilterDone}
-                            />
-                        </View>
-                        <View style={styles.actionRow}>
-                            <TouchableOpacity onPress={this.openFilterModal} style={styles.cancelButtonRow}>
-                                <Text style={styles.cancelButtonText}>{"Cancel"}</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={this.onApplyFilters} style={styles.filterButtonRow}>
-                                <Text style={styles.filterButtonText}>{"Apply Filters"}</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </Modal>
-            </View>
-        );
+                {/* Header - Control Test Bar */}
+                <View style={styles.controlBar}>
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={this.reload}>
+                        <Text style={styles.text}>Reload</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={this.loadMore}>
+                        <Text style={styles.text}>Load more</Text>
+                    </TouchableOpacity>
+                </View>
+
+                <Image
+                    resizeMode='contain'
+                    source={require('./simbol.png')}
+                    style={{position: 'absolute', bottom: 26, right: 8, width: 64, height: 64}}/>
+            </SafeAreaView>
+        )
     }
 }
-
-HomeScreen.navigationOptions = {
-    header: null,
-};
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-    },
-    contentContainer: {
-        paddingTop: 30,
-    },
-    getStartedContainer: {
         alignItems: 'center',
-        marginHorizontal: 50,
-    },
-    containerModal: {
-        backgroundColor: "pink",
-        paddingHorizontal: 20,
-        alignItems: 'center'
-    },
-    blueRow:{
-        borderColor: "blue",
-        borderWidth: 2,
-        alignItems:"flex-start",
-        alignSelf: "flex-start",
-        marginTop: 5,
-        width:"20%",
-        marginLeft:20
-    },
-    filterMainRow:{
-        flex: 0.6,
-        backgroundColor: 'white',
-        alignItems: 'center',
-        shadowColor: "gray",
-        shadowOffset: {height: 0, width: 0},
-        shadowOpacity: 0.5,
-        justifyContent: 'center'
-    },
-    filterInputRow: {
-        flex: 1,
-        backgroundColor: 'white',
-        width:"90%"
-    },
-    filterTitleRow:{
-        marginVertical: 8,
-    },
-    filterHeaderText:{
-        fontSize: 18,
-        paddingLeft: 5,
-        paddingTop: 5,
         justifyContent: 'center',
-        alignSelf: "flex-start",
+        backgroundColor: '#F5FCFF',
     },
-    actionRow: {
-        flexDirection: "row",
-        alignItems: "flex-start",
-        justifyContent: 'center'
-    },
-    cancelButtonRow:{
-        justifyContent: 'center',
-        flexDirection: 'row',
-        height: 50,
-        minHeight: 50,
-        width: "40%",
-        marginRight:5,
-        alignItems: "center",
-        marginVertical: 8
-    },
-    cancelButtonText:{
-        color: "black",
-        fontSize: 18,
-    },
-    filterButtonRow:{
-        justifyContent: 'center',
-        flexDirection: 'row',
-        height: 50,
-        minHeight: 50,
-        width: "40%",
+    clusterContainer: {
+        width: 30,
+        height: 30,
+        padding: 6,
         borderWidth: 1,
-        alignSelf: "flex-end",
-        alignItems: "center",
-        borderColor: "lightgray",
-        borderRadius: 10,
-        marginVertical: 8,
-        backgroundColor: "white",
-        shadowColor: "lightgray",
-        shadowOpacity: 0.5,
-        elevation: 3,
-        shadowOffset: {
-            height: 0,
-            width: 0
-        }
+        borderRadius: 15,
+        alignItems: 'center',
+        borderColor: '#65bc46',
+        justifyContent: 'center',
+        backgroundColor: 'white',
     },
-    filterButtonText: {
-        color: "black",
-        fontSize: 18,
-        paddingLeft: 10
-    }
-});
+    clusterText: {
+        fontSize: 13,
+        color: '#65bc46',
+        fontWeight: '500',
+        textAlign: 'center',
+    },
+    controlBar: {
+        top: 48,
+        left: 25,
+        right: 25,
+        height: 40,
+        borderRadius: 20,
+        position: 'absolute',
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        backgroundColor: 'white',
+        justifyContent: 'space-between',
+    },
+    button: {
+        paddingVertical: 8,
+        paddingHorizontal: 20,
+    },
+    novaLabLogo: {
+        right: 8,
+        bottom: 8,
+        width: 64,
+        height: 64,
+        position: 'absolute',
+    },
+    text: {
+        fontSize: 16,
+        fontWeight: 'bold'
+    },
+    // clusterContainer: {
+    //     width: 24,
+    //     height: 24,
+    //     borderWidth: 1,
+    //     borderRadius: 12,
+    //     alignItems: 'center',
+    //     borderColor: '#65bc46',
+    //     justifyContent: 'center',
+    //     backgroundColor: '#fff'
+    // },
+    counterText: {
+        fontSize: 14,
+        color: '#65bc46',
+        fontWeight: '400'
+    },
+    calloutStyle: {
+        width: 64,
+        height: 64,
+        padding: 8,
+        borderRadius: 8,
+        borderColor: '#65bc46',
+        backgroundColor: 'white',
+    },
+})
