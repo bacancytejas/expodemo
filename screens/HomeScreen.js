@@ -76,36 +76,27 @@ export default class App extends Component {
 
     render() {
         return (
+
             <MapView
                 style = {{flex: 1}}
-                region = { {
-                    latitude: -37.8025259,
-                    longitude: -122.4351431,
+                region = {{
+                    latitude: -29.1482491,
+                    longitude: -51.1559028,
                     latitudeDelta: 0.0922,
                     longitudeDelta: 0.0421,
                 } }
                 showsUserLocation={ true }
                 followUserLocation={ true }
                 onRegionChangeComplete = { this.onRegionChangeComplete }>
-                <MapView.Polygon
-                    coordinates={[
-                        { latitude: 37.8025259, longitude: -122.4351431 },
-                        { latitude: 37.7896386, longitude: -122.421646 },
-                        { latitude: 37.7665248, longitude: -122.4161628 },
-                        { latitude: 37.7734153, longitude: -122.4577787 },
-                        { latitude: 37.7948605, longitude: -122.4596065 },
-                        { latitude: 37.8025259, longitude: -122.4351431 }
-                    ]}
-                    strokeColor="#000" // fallback for when `strokeColors` is not supported by the map-provider
-                    strokeColors={[
-                        '#7F0000',
-                        '#00000000', // no color, creates a "long" gradient between the previous and next coordinate
-                        '#B24112',
-                        '#E5845C',
-                        '#238C23',
-                        '#7F0000'
-                    ]}
-                    strokeWidth={6}
+                <MapView.Circle
+                    center={{
+                        latitude: -29.1471337,
+                        longitude: -51.148951,
+                    }}
+                    radius={500}
+                    strokeWidth={5}
+                    strokeColor="#3399ff"
+                    fillColor="#80bfff"
                 />
             </MapView>
         )
