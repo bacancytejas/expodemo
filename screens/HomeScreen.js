@@ -76,7 +76,7 @@ export default class App extends Component {
                 {/* Cluster Map Example */}
                 <ClusteredMapView
                     style={{flex: 1}}
-                    provider={MapView.PROVIDER_GOOGLE}
+                    provider={MapView.PROVIDER_GOOGLE} //https://medium.com/nycdev/create-a-react-native-app-with-google-map-using-expo-io-68041252023d
                     showUserLocation={true}
                     data={this.state.pins}
                     renderMarker={this.renderMarker}
