@@ -10,7 +10,7 @@ import {
     SafeAreaView,
     TouchableOpacity,
 } from 'react-native'
-import MapView, { PROVIDER_GOOGLE, Marker, Callout } from 'react-native-maps'
+import MapView, {Polyline, PROVIDER_GOOGLE, Marker, Callout } from 'react-native-maps'
 import ClusteredMapView from 'react-native-maps-super-cluster'
 import { generateRandomPoints, generateRandomPoint } from './generator'
 
@@ -31,6 +31,7 @@ export default class App extends Component {
         this.loadMore = this.loadMore.bind(this)
         this.renderMarker = this.renderMarker.bind(this)
         this.renderCluster = this.renderCluster.bind(this)
+        this.onRegionChangeComplete = this.onRegionChangeComplete.bind(this);
     }
 
     componentDidMount() {
@@ -63,6 +64,10 @@ export default class App extends Component {
         )
     }
 
+    onRegionChangeComplete = (test) => {
+        console.log("TEST--",test);
+    }
+
     renderMarker = (pin) => {
         return (
             <Marker identifier={`pin-${pin.id}`} key={pin.id} coordinate={pin.location} />
@@ -71,42 +76,38 @@ export default class App extends Component {
 
     render() {
         return (
-            <SafeAreaView style={styles.container}>
-                {/* Cluster Map Example */}
-                <ClusteredMapView
-                    style={{flex: 1}}
-                    provider={PROVIDER_GOOGLE} //https://medium.com/nycdev/create-a-react-native-app-with-google-map-using-expo-io-68041252023d
-                    showUserLocation={true}
-                    data={this.state.pins}
-                    renderMarker={this.renderMarker}
-                    renderCluster={this.renderCluster}
-                    initialRegion={{latitude: italyCenterLatitude, longitude: italyCenterLongitude, latitudeDelta: 12, longitudeDelta: 12 }}>
-                    {/*
-                        Markers rendered as children of ClusteredMapView are not taken in account by the clustering feature,
-                        they will just act as they were rendered within a normal react-native-maps instance
-                    */}
-                    {/*<Marker coordinate={{ latitude: 44.710968, longitude: 10.640131 }} pinColor={'#65bc46'} />*/}
-                </ClusteredMapView>
-
-                {/* Header - Control Test Bar */}
-                <View style={styles.controlBar}>
-                    <TouchableOpacity
-                        style={styles.button}
-                        onPress={this.reload}>
-                        <Text style={styles.text}>Reload</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.button}
-                        onPress={this.loadMore}>
-                        <Text style={styles.text}>Load more</Text>
-                    </TouchableOpacity>
-                </View>
-
-                <Image
-                    resizeMode='contain'
-                    source={require('./simbol.png')}
-                    style={{position: 'absolute', bottom: 26, right: 8, width: 64, height: 64}}/>
-            </SafeAreaView>
+            <MapView
+                style = {{flex: 1}}
+                region = { {
+                    latitude: -37.8025259,
+                    longitude: -122.4351431,
+                    latitudeDelta: 0.0922,
+                    longitudeDelta: 0.0421,
+                } }
+                showsUserLocation={ true }
+                followUserLocation={ true }
+                onRegionChangeComplete = { this.onRegionChangeComplete }>
+                <MapView.Polygon
+                    coordinates={[
+                        { latitude: 37.8025259, longitude: -122.4351431 },
+                        { latitude: 37.7896386, longitude: -122.421646 },
+                        { latitude: 37.7665248, longitude: -122.4161628 },
+                        { latitude: 37.7734153, longitude: -122.4577787 },
+                        { latitude: 37.7948605, longitude: -122.4596065 },
+                        { latitude: 37.8025259, longitude: -122.4351431 }
+                    ]}
+                    strokeColor="#000" // fallback for when `strokeColors` is not supported by the map-provider
+                    strokeColors={[
+                        '#7F0000',
+                        '#00000000', // no color, creates a "long" gradient between the previous and next coordinate
+                        '#B24112',
+                        '#E5845C',
+                        '#238C23',
+                        '#7F0000'
+                    ]}
+                    strokeWidth={6}
+                />
+            </MapView>
         )
     }
 }
