@@ -12,6 +12,10 @@ const Icon = createIconSetFromIcoMoon(
     'icomoon.ttf'
 );
 import AppNavigator from './navigation/AppNavigator';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/es/integration/react';
+import configureStore from './redux/configureStore';
+const { persistor, store } = configureStore();
 
 export default function App(props) {
   const [isLoadingComplete, setLoadingComplete] = useState(false);
@@ -26,10 +30,17 @@ export default function App(props) {
     );
   } else {
     return (
-      <View style={styles.container}>
-        {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-          <AppNavigator />
-      </View>
+        <View style={styles.container}>
+            <Provider store={store}>
+                <PersistGate
+                    loading={null}
+                    persistor={persistor}
+                >
+                    {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
+                    <AppNavigator />
+                </PersistGate>
+            </Provider>
+        </View>
     );
   }
 }

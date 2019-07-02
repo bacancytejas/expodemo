@@ -1,181 +1,177 @@
 // @flow
+import CustomTab from "./CustomTab";
+
 'use-strict'
 
 import React, { Component } from 'react'
 import {
-    Text,
-    View,
-    Image,
     StyleSheet,
-    SafeAreaView,
+    View,
+    Text,
+    Dimensions,
     TouchableOpacity,
-} from 'react-native'
-import MapView, {Polyline, PROVIDER_GOOGLE, Marker, Callout } from 'react-native-maps'
-import ClusteredMapView from 'react-native-maps-super-cluster'
-import { generateRandomPoints, generateRandomPoint } from './generator'
+    Platform
+} from 'react-native';
+import InputField from "../components/InputField";
+import {reduxForm} from "redux-form";
+const { width, height } = Dimensions.get('window');
 
-
-const italyCenterLatitude = 41.8962667,
-    italyCenterLongitude = 11.3340056,
-    radius = 600000
-export default class App extends Component {
+class App extends Component {
 
     constructor(props) {
-        super(props)
-
+        super(props);
         this.state = {
-            pins: []
-        }
-
-        this.reload = this.reload.bind(this)
-        this.loadMore = this.loadMore.bind(this)
-        this.renderMarker = this.renderMarker.bind(this)
-        this.renderCluster = this.renderCluster.bind(this)
-        this.onRegionChangeComplete = this.onRegionChangeComplete.bind(this);
+            selectedTab:"Tab1"
+        };
     }
 
-    componentDidMount() {
-        this.reload()
-    }
-
-    reload = () => {
-        const pins = generateRandomPoints({latitude: italyCenterLatitude, longitude: italyCenterLongitude}, radius, 50, this.state.pins.length)
-        this.setState({ pins: pins})
-    }
-
-    loadMore = () => {
-        const pins = generateRandomPoints({latitude: italyCenterLatitude, longitude: italyCenterLongitude}, radius, 50, this.state.pins.length)
-        this.setState({ pins: this.state.pins.concat(pins) })
-    }
-
-    renderCluster = (cluster, onPress) => {
-        const pointCount = cluster.pointCount,
-            coordinate = cluster.coordinate,
-            clusterId = cluster.clusterId
-
-        return (
-            <Marker identifier={`cluster-${clusterId}`} coordinate={coordinate} onPress={onPress}>
-                <View style={styles.clusterContainer}>
-                    <Text style={styles.clusterText}>
-                        {pointCount}
-                    </Text>
-                </View>
-            </Marker>
-        )
-    }
-
-    onRegionChangeComplete = (test) => {
-        console.log("TEST--",test);
-    }
-
-    renderMarker = (pin) => {
-        return (
-            <Marker identifier={`pin-${pin.id}`} key={pin.id} coordinate={pin.location} />
-        )
+    handleTabClick = (selectedTab) => {
+        this.setState({selectedTab:selectedTab});
     }
 
     render() {
+        const {selectedTab} = this.state;
         return (
+            <View style={styles.container}>
+                <View style={styles.detailRow}>
+                    <View style={styles.tabRow}>
+                        <CustomTab
+                            tabName={"Test1"}
+                            selected={selectedTab}
+                            onPressTab={this.handleTabClick}
+                            tabItem={["Tab1","Tab2","Tab3"]}
+                        />
+                    </View>
+                    <View style={styles.cardDetailBody}>
+                        {
+                            selectedTab === "Tab1" && <View>
+                                <View style={{marginVertical:10, marginHorizontal:5}}>
+                                    <InputField
+                                        multiline={true}
+                                        numberOfLines={4}
+                                        name='Name'
+                                        label='Full Name'
+                                        returnKeyType='next'
+                                        placeholder='Enter Full Name'
+                                        keyboardType='default'
+                                        refField={ref => this.name = ref}
+                                        autoCapitalize={'none'}
+                                        editable={true}
+                                        onSubmitEditing={() => {
 
-            <MapView
-                style = {{flex: 1}}
-                region = {{
-                    latitude: -29.1482491,
-                    longitude: -51.1559028,
-                    latitudeDelta: 0.0922,
-                    longitudeDelta: 0.0421,
-                } }
-                showsUserLocation={ true }
-                followUserLocation={ true }
-                onRegionChangeComplete = { this.onRegionChangeComplete }>
-                <MapView.Circle
-                    center={{
-                        latitude: -29.1471337,
-                        longitude: -51.148951,
-                    }}
-                    radius={500}
-                    strokeWidth={5}
-                    strokeColor="#3399ff"
-                    fillColor="#80bfff"
-                />
-            </MapView>
-        )
+                                        }}
+                                    />
+                                </View>
+                                <View style={{marginVertical:10, marginHorizontal:5}}>
+                                    <InputField
+                                        multiline={true}
+                                        numberOfLines={4}
+                                        name='Name'
+                                        label='Full Name'
+                                        returnKeyType='next'
+                                        placeholder='Enter Full Name'
+                                        keyboardType='default'
+                                        refField={ref => this.name = ref}
+                                        autoCapitalize={'none'}
+                                        editable={true}
+                                        onSubmitEditing={() => {
+
+                                        }}
+                                    />
+                                </View>
+                                <View style={{marginVertical:10, marginHorizontal:5}}>
+                                    <InputField
+                                        multiline={true}
+                                        numberOfLines={4}
+                                        name='Name'
+                                        label='Full Name'
+                                        returnKeyType='next'
+                                        placeholder='Enter Full Name'
+                                        keyboardType='default'
+                                        refField={ref => this.name = ref}
+                                        autoCapitalize={'none'}
+                                        editable={true}
+                                        onSubmitEditing={() => {
+
+                                        }}
+                                    />
+                                </View>
+                            </View>
+                        }
+                    </View>
+                </View>
+            </View>
+        );
     }
+
 }
+
+const initialValues = {
+    name: '',
+};
+
+const withForm = reduxForm({
+    form: 'TestForm',
+    initialValues
+});
+
+export default withForm(App);
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#F5FCFF',
+       flex:1,
     },
-    clusterContainer: {
-        width: 30,
-        height: 30,
-        padding: 6,
-        borderWidth: 1,
-        borderRadius: 15,
-        alignItems: 'center',
-        borderColor: '#65bc46',
-        justifyContent: 'center',
-        backgroundColor: 'white',
+    cardRow:{
+        marginHorizontal:10,
+        marginVertical:10
     },
-    clusterText: {
-        fontSize: 13,
-        color: '#65bc46',
-        fontWeight: '500',
-        textAlign: 'center',
+    cardStyle:{
+        borderTopWidth:0.5,
+        borderLeftWidth:0.5,
+        borderRightWidth:0.5,
+        borderBottomWidth:0,
+        borderColor:"gray",
+        borderTopLeftRadius: 15,
+        borderTopRightRadius: 15,
+        backgroundColor: "dodgerblue",
+        shadowColor: "gray",
+        shadowRadius: 10,
+        shadowOpacity: 0.2,
+        elevation: Platform === 'ios' ? 0 : 3,
+        shadowOffset: {
+            height: 0,
+            width: 0
+        }
     },
-    controlBar: {
-        top: 48,
-        left: 25,
-        right: 25,
-        height: 40,
-        borderRadius: 20,
-        position: 'absolute',
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 20,
-        backgroundColor: 'white',
-        justifyContent: 'space-between',
+    cardHeader:{
+        flexDirection:"row",
+        padding:10
     },
-    button: {
-        paddingVertical: 8,
-        paddingHorizontal: 20,
+    cardHeaderMainRow:{flex:1, flexDirection:"row", paddingVertical:4, justifyContent:"space-between"},
+    cardHeaderTitleRow: {marginLeft:10, backgroundColor: "deeppink", borderWidth:1, borderColor:"deeppink", borderRadius:4, justifyContent:"center"},
+    cardTitleText:{color:"white", fontWeight: "600"},
+    cardHeaderIconRow:{alignSelf:"flex-end", color:"white", fontWeight: "600"},
+    cardBody:{
+        backgroundColor:"white",
     },
-    novaLabLogo: {
-        right: 8,
-        bottom: 8,
-        width: 64,
-        height: 64,
-        position: 'absolute',
+    detailRow:{
+        marginTop:10,
+        marginHorizontal:10
     },
-    text: {
-        fontSize: 16,
-        fontWeight: 'bold'
+    tabRow: {
+        flexDirection:"row",
+        alignItems:"center",
+        justifyContent:"space-around",
+
     },
-    // clusterContainer: {
-    //     width: 24,
-    //     height: 24,
-    //     borderWidth: 1,
-    //     borderRadius: 12,
-    //     alignItems: 'center',
-    //     borderColor: '#65bc46',
-    //     justifyContent: 'center',
-    //     backgroundColor: '#fff'
-    // },
-    counterText: {
-        fontSize: 14,
-        color: '#65bc46',
-        fontWeight: '400'
+    cardDetailBody:{
+        backgroundColor:"lightgray",
+        justifyContent:"center",
+        marginHorizontal:2
     },
-    calloutStyle: {
-        width: 64,
-        height: 64,
-        padding: 8,
-        borderRadius: 8,
-        borderColor: '#65bc46',
-        backgroundColor: 'white',
+    label: {
+        fontSize:15,
+        color: "gray",
+        marginVertical: 4
     },
 })
